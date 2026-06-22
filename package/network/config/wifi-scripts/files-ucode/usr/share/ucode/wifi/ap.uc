@@ -400,10 +400,12 @@ function iface_roaming(config) {
 
 	if (!config.ft_psk_generate_local) {
 		if (!config.r0kh || !config.r1kh) {
-			if (!config.auth_secret && !config.key)
+			let ft_secret = config.auth_secret ?? config.auth_server_shared_secret ?? config.key;
+
+			if (!ft_secret)
 				netifd.setup_failed('FT_KEY_CANT_BE_DERIVED');
 
-			let ft_key = md5(`${config.mobility_domain}/${config.auth_secret ?? config.key}`);
+			let ft_key = md5(`${config.mobility_domain}/${ft_secret}`);
 
 			set_default(config, 'r0kh', [ 'ff:ff:ff:ff:ff:ff,*,' + ft_key ]);
 			set_default(config, 'r1kh', [ '00:00:00:00:00:00,00:00:00:00:00:00,' + ft_key ]);
